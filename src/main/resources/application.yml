@@ -1,0 +1,57 @@
+server :
+  port: 8080
+
+spring:
+
+  # ?????
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/jwt_login?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root  # ???????????
+    password: 123456  # ??????????
+  # Spring Security??
+  # Redis 配置
+  redis:
+    host: 192.168.88.128
+    port: 6379
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: -1ms
+    # password: 123456  # 如果你的 Redis 设置了密码，在这里配置
+
+# MyBatis-Plus??
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true  # ??????
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # ??SQL??
+  global-config:
+    db-config:
+      id-type: AUTO  # ????
+  mapper-locations: classpath:mapper/**/*.xml  # Mapper.xml??????
+
+# JWT??
+jwt:
+  secret: your-secret-key-1234567890-abcdefghijklmnopqrstuvwxyz  # ????????????32??
+  expiration: 86400000  # token????????????24??
+  header: Authorization  # ????token?key
+# 新增内容创作配置
+creation:
+  # 文件上传配置
+  upload:
+    base-path: ./creation/upload/  # 本地存储路径（需提前创建）
+    max-size: 104857600  # 最大文件大小（100MB）
+    allowed-types: jpg,png,jpeg,mp4,avi,doc,docx,txt  # 允许上传的文件类型
+  # 草稿箱自动保存时间（分钟）
+  draft:
+    auto-save-interval: 5
+
+# 消息通知服务配置（对接外部消息服务）
+message:
+  notify:
+    url: http://localhost:8081/api/notify/publish  # 消息推送接口
+    app-key: your-notify-app-key
+    secret: your-notify-secret

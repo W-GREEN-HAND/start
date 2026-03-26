@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: wmall-gateway
+
+  redis:
+    host: 192.168.88.128
+    port: 6379
+    database: 0
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: -1ms
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+      routes:
+        - id: user-service
+          uri: lb://wmall-user-service
+          predicates:
+            - Path=/api/user/**
+          filters: # 局部过滤器
+            - AddRequestHeader=X-Gateway-Source, wmall-gateway
+
+        - id: goods-service
+          uri: lb://wmall-goods-service
+          predicates:
+            - Path=/goods/**
+          filters: # 局部过滤器
+            - AddRequestHeader=X-Gateway-Source, wmall-gateway
+
+        - id: order-service
+          uri: lb://wmall-order-service
+          predicates:
+            - Path=/orders/**
+          filters: # 局部过滤器
+            - AddRequestHeader=X-Gateway-Source, wmall-gateway
+            
+    # 全局跨域配置，解决前端跨域问题
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "http://localhost:8081" # 生产环境指定具体前端域名，不要用*
+            allowed-methods: [GET, POST, PUT, DELETE, OPTIONS] # 允许的请求方法
+            allowed-headers: "*" # 允许的请求头
+            allow-credentials: true # 允许携带Cookie等凭证
+            max-age: 3600 # 跨域预检请求的缓存时间（秒）
+      # 网关请求超时配置，避免长时间阻塞
+      httpclient:
+        connect-timeout: 3000 # 连接超时时间（毫秒）
+        response-timeout: 5000 # 响应超时时间（毫秒）
+
+jwt:
+  secret: your-secret-key-1234567890-abcdefghijklmnopqrstuvwxyz
+  expiration: 86400000
+  header: Authorization
+
+server:
+  port: 8080
